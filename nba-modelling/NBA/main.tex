@@ -1,0 +1,185 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{NBA Modeling}
+\author{Baiqing Chen}
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Feature Engineering}
+
+The original dataset contained a large number of raw team-game variables, including box-score fields, shot-profile summaries, and tracking-style possession statistics. I did not use these raw columns directly. Instead, the final feature set was built in three steps: removing obviously unhelpful fields, converting post-game statistics into leakage-safe historical features, and then selecting a compact set of representative predictors.
+
+First, I removed variables that were either identifiers, internal bookkeeping fields, or exact duplicates of other columns. This included fields such as \texttt{\_id}, \texttt{our\_fixture\_id}, \texttt{our\_team\_id}, as well as duplicated scoring/free-throw columns such as \texttt{total\_points}, \texttt{ft\_makes}, and \texttt{ft\_attempts}. These fields do not add genuine predictive information.
+
+Second, many of the remaining variables were only known \emph{after} the game had been played, for example team points, ratings, possessions, and shooting statistics. Using them directly would create leakage. To avoid this, I transformed them into \textbf{historical pre-game features}. For each team and each post-game statistic $z_t$, I lagged the series by one match and then computed rolling summaries such as recent 5-game means and a small number of expanding averages:
+$
+\tilde{z}_t = z_{t-1}.
+$
+This ensured that all engineered predictors at time $t$ depended only on information available before game $t$. I also added a few genuinely pre-game schedule variables such as \texttt{rest\_days}, \texttt{is\_b2b}, and \texttt{games\_last\_7d}.
+
+After this rolling-window expansion and the later home/away merge, the engineered feature space became very wide. In practice, this broader feature space performed worse out-of-sample, suggesting that many additional variables were redundant, unstable, or only weakly informative.
+
+I therefore moved to a compact final set of \textbf{41 features}, chosen to represent the main drivers of NBA scoring while avoiding unnecessary duplication. These features covered:
+\begin{itemize}
+    \item recent scoring and concession,
+    \item offensive/defensive efficiency and pace,
+    \item shooting efficiency and shot mix,
+    \item schedule effects,
+    \item matchup interaction terms,
+    \item team identity,
+    \item and a small number of home/away-specific historical averages.
+\end{itemize}
+
+This was a domain-guided selection rather than a purely automatic one. The aim was to keep one or two strong representatives for each predictive concept, rather than many closely related variants of the same signal. Empirically, the compact feature set substantially improved out-of-sample performance relative to the much larger engineered feature space, which supports the view that the extra variables mainly added noise or low incremental information.
+\section{Model and Evaluation}
+\subsection{Problem Formulation}
+
+The goal is to predict \textbf{pre-game scoring distributions} for both teams in each NBA match.
+For every game $i$, with pre-game feature vector $X_i$, I model
+$
+Y_{i,\text{home}} \mid X_i \sim \mathcal{N}\big(\mu_{\text{home}}(X_i), \sigma_{\text{home}}^2\big)
+$
+and
+$
+Y_{i,\text{away}} \mid X_i \sim \mathcal{N}\big(\mu_{\text{away}}(X_i), \sigma_{\text{away}}^2\big),
+$
+where $Y_{i,\text{home}}$ is the home team's points, $Y_{i,\text{away}}$ is the away team's points, $\mu_{\text{home}}(X_i)$ and $\mu_{\text{away}}(X_i)$ are match-specific conditional mean predictions, and $\sigma_{\text{home}}$, $\sigma_{\text{away}}$ are predictive standard deviations estimated from validation residuals.
+
+I modelled home and away points \textbf{separately}, rather than fitting a joint multivariate distribution. In the final implementation, uncertainty is therefore represented through \textbf{two marginal Gaussian predictive distributions}, one for the home team and one for the away team. This provides both a point forecast (the predictive mean) and an uncertainty estimate (the predictive variance and prediction interval).
+
+The conditional means were estimated using \textbf{histogram-based gradient boosting regressors} trained on pre-game features only. These features were engineered from historical team performance and schedule information, with all same-game statistics lagged before rolling aggregation in order to avoid data leakage.
+
+\subsection{Validation Approach}
+
+Because this is a forecasting problem, I used a \textbf{chronological split} rather than random train/test sampling. Random splitting would leak future information into the past and produce overly optimistic estimates of performance.
+
+The modelling pipeline used three time-ordered subsets:
+\begin{itemize}
+    \item \textbf{Train}: earliest 70\% of games,
+    \item \textbf{Validation}: next 15\% of games,
+    \item \textbf{Test}: final 15\% of games.
+\end{itemize}
+
+This split was applied after sorting games by match date.
+
+The train set was used to fit the mean models. The validation set served two purposes:
+\begin{enumerate}
+    \item model development and feature selection,
+    \item estimation of predictive uncertainty from out-of-sample residuals.
+\end{enumerate}
+
+After fitting the mean model on the training set, I predicted the validation set and computed residuals:
+$
+e^{(val)}_{\text{home},i} = y^{(val)}_{\text{home},i} - \hat{\mu}_{\text{home}}(x_i)
+$
+and
+$
+e^{(val)}_{\text{away},i} = y^{(val)}_{\text{away},i} - \hat{\mu}_{\text{away}}(x_i).
+$
+
+I then estimated
+$
+\hat{\sigma}_{\text{home}} = \mathrm{sd}\!\left(e^{(val)}_{\text{home}}\right)
+$
+and
+$
+\hat{\sigma}_{\text{away}} = \mathrm{sd}\!\left(e^{(val)}_{\text{away}}\right).
+$
+
+Using validation residuals, rather than in-sample training residuals, avoids underestimating predictive uncertainty.
+
+After selecting the final feature set and uncertainty specification, I retrained the mean models on the combined \textbf{train + validation} period and evaluated final performance once on the held-out test set.
+
+All imputers were fit on the appropriate training portion only, then applied to later data, to avoid leakage.
+
+\section{Quantitative Evaluation}
+
+I evaluated both \textbf{point prediction accuracy} and \textbf{probabilistic calibration}.
+
+For point prediction accuracy, I used:
+\begin{itemize}
+    \item \textbf{MAE (Mean Absolute Error)}
+    $
+    \text{MAE} = \frac{1}{n}\sum_{i=1}^n |y_i - \hat{\mu}_i|
+    $
+    \item \textbf{RMSE (Root Mean Squared Error)}
+    $
+    \text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^n (y_i - \hat{\mu}_i)^2}
+    $
+\end{itemize}
+
+For probabilistic prediction quality, I used:
+\begin{itemize}
+    \item \textbf{Gaussian Negative Log-Likelihood (NLL)}. This evaluates whether the predicted Gaussian distribution assigns high probability to the observed outcome while also penalising overconfidence.
+    \item \textbf{80\% prediction interval coverage}. I computed the proportion of realised scores that fell inside the nominal 80\% predictive interval.
+    \item \textbf{80\% average interval width}. This measures sharpness: narrower intervals are better, provided calibration remains reasonable.
+\end{itemize}
+
+Final test performance for the selected feature set was:
+
+\paragraph{Home points}
+\begin{itemize}
+    \item MAE: $10.229$
+    \item RMSE: $13.096$
+    \item Gaussian NLL: $3.998$
+    \item 80\% interval coverage: $0.778$
+    \item 80\% average interval width: $30.919$
+\end{itemize}
+
+\paragraph{Away points}
+\begin{itemize}
+    \item MAE: $9.766$
+    \item RMSE: $12.603$
+    \item Gaussian NLL: $3.954$
+    \item 80\% interval coverage: $0.793$
+    \item 80\% average interval width: $31.133$
+\end{itemize}
+
+These results suggest that point prediction accuracy is reasonable for a noisy pre-game team-scoring task, and that the final predictive intervals are fairly well calibrated, with empirical coverage close to the nominal 80\% level.
+
+\subsection{Discussion}
+
+A key modelling choice was to use \textbf{only pre-game information}. Many raw box-score and tracking variables in the dataset are only known after the game has been played, so using them directly would create leakage. To avoid this, I transformed these same-game statistics into lagged rolling features such as recent means and schedule-based summaries.
+
+Another important modelling choice was \textbf{feature selection}. The engineered dataset became very wide after rolling-window expansion and home/away merging. A broad feature set with hundreds of columns performed worse out-of-sample, suggesting redundancy, instability, and noise. I therefore moved to a compact, domain-guided feature set focused on:
+\begin{itemize}
+    \item recent scoring and concession,
+    \item offensive and defensive efficiency,
+    \item pace,
+    \item shooting efficiency and shot mix,
+    \item schedule effects,
+    \item matchup interactions,
+    \item team identity,
+    \item a small number of home/away-specific historical features.
+\end{itemize}
+
+This substantially improved both point prediction and probabilistic calibration.
+\subsection{Limitations}
+
+The main limitations are:
+\begin{enumerate}
+    \item \textbf{Independent marginal distributions}: home and away points were modelled separately, so the final model does not explicitly capture residual correlation between the two scores within the same game.
+    \item \textbf{Constant predictive variance}: uncertainty was modelled with a constant $\sigma$ for home and away scores rather than a match-specific heteroskedastic variance model.
+    \item \textbf{Limited feature set}: the final feature set was intentionally compact for stability, so some potentially useful information may have been excluded.
+    \item \textbf{Missing external information}: I did not include injuries, starting line-ups, rest/travel detail, betting market prices, or roster changes, all of which are likely to improve single-game score prediction.
+\end{enumerate}
+
+\subsection{Possible Improvements}
+
+With more time, I would explore:
+\begin{itemize}
+    \item explicit modelling of \textbf{home-away score covariance}, for example with a bivariate Gaussian framework,
+    \item richer but better-regularised feature selection,
+    \item alternative targets such as \textbf{total points} and \textbf{margin}, then mapping back to home and away scores,
+    \item comparison against a regularised linear baseline such as Ridge or Elastic Net,
+    \item incorporation of important external pre-game information such as injury reports and market lines,
+    \item more extensive rolling-origin cross-validation rather than a single chronological holdout.
+\end{itemize}
+
+Overall, the final model is best viewed as a leakage-safe, interpretable probabilistic baseline that balances predictive accuracy, calibration, and clarity.
+
+\end{document}
