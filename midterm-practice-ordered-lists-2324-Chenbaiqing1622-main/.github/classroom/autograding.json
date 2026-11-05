@@ -1,0 +1,114 @@
+{
+  "tests": [
+    {
+      "name": "setup",
+      "setup": "python3 -m venv venv",
+      "run": "venv/bin/python -m pip install -U pip; venv/bin/python -m pip install pytest setuptools pytest-timeout flake8 pep8-naming numpy",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": null
+    },
+    {
+      "name": "Q1-aii",
+      "setup": "",
+      "run": "venv/bin/python -m pip install -e .",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "Q1-aii",
+      "setup": "venv/bin/python -m pip install -e .",
+      "run": "venv/bin/python -m pytest tests/test_question_1.py -m q1_aii",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "Q1-bi",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_question_1.py -m q1_bi",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 2
+    },
+    {
+      "name": "Q1-bii",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_question_1.py -m q1_bii",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "Q1-biii",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_question_1.py -m q1_biii",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "Q1-biv",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_question_1.py -m q1_biv",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 2
+    },
+    {
+      "name": "Q1-bv",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_question_1.py -m q1_bv",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "Q1-ci",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_question_1.py -m q1_ci",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 3
+    },
+    {
+      "name": "Q1-cii",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_question_1.py -m q1_cii",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 4
+    },
+    {
+      "name": "Q1-d",
+      "setup": "",
+      "run": "venv/bin/python -m flake8 lists/",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 2
+    }
+  ]
+}

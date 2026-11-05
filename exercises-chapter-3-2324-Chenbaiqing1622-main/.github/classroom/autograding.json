@@ -1,0 +1,104 @@
+{
+  "tests": [
+    {
+      "name": "exercise-3-3",
+      "setup": "python3 -m venv venv; venv/bin/python -m pip install pytest numpy",
+      "run": "venv/bin/python -m pip install -e .",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-4-0",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_4_0.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-4-1",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_4_1.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-4-2",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_4_2.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-4-3",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_4_3.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-4-4",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_4_4.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-5",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_5.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-6-1",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_6_1.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-6-2",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_6_2.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-3-6-3",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_3_6_3.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    }
+  ]
+}

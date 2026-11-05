@@ -1,0 +1,64 @@
+{
+  "tests": [
+    {
+      "name": "setup",
+      "setup": "python3 -m venv venv",
+      "run": "venv/bin/python -m pip install numpy pytest pytest-timeout flake8 pep8-naming flake8-docstrings",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": null
+    },
+    {
+      "name": "package-install",
+      "setup": "",
+      "run": "venv/bin/python -m pip install -e .",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-5-4",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_5_4.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-5-5",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_5_5.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "exercise-5-6",
+      "setup": "",
+      "run": "venv/bin/python -m pytest tests/test_exercise_5_6.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    },
+    {
+      "name": "flake8-test",
+      "setup": "",
+      "run": "venv/bin/python -m flake8 adt_examples/",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 1,
+      "points": 1
+    }
+  ]
+}
