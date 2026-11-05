@@ -1,0 +1,84 @@
+\chapter{Conclusion and Discussion}
+\section{Summary}
+This project investigated the detection of money mule accounts using behavioural
+transaction features together with both unsupervised and supervised machine learning
+approaches.
+
+A set of account-level features was designed to capture characteristics commonly
+associated with money mule behaviour, including transaction frequency, pass-through
+activity, draining behaviour, and many-out transfer patterns. These features were first
+used in an unsupervised setting through DBSCAN and autoencoder models to identify
+accounts whose behaviour deviated from the majority of retail customers. Subsequently,
+confirmed mule accounts provided by the bank were incorporated to construct supervised
+baselines using logistic regression and XGBoost.
+
+The experimental results suggest that behavioural features provide meaningful
+information for distinguishing suspicious accounts. DBSCAN successfully separated a
+small set of behavioural outliers, while the autoencoder trained on the presumed normal
+population achieved substantially better reconstruction quality than the model trained on
+the entire dataset. This supports the assumption that learning only normal behaviour is
+more suitable for reconstruction-based anomaly detection. Among the supervised models,
+XGBoost produced the strongest overall detection performance, indicating that nonlinear
+relationships between behavioural features are important for identifying money mule
+activity. Compared with the unsupervised ones, supervised methods enhanced the explainability and cross-validate the feature importance. All methods shown the drain ratio is a very strong feature.
+
+Overall, the study demonstrates that combining domain-driven behavioural feature
+engineering with machine learning provides a practical framework for prioritising
+potential money mule accounts for further investigation.
+\section{Limitation}
+Although the proposed framework produced encouraging results, several limitations
+remain.
+
+First, computational constraints limited the scale of several experiments. In particular,
+the FIFO-based drain ratio feature requires sequential allocation of outgoing
+transactions to incoming transactions, making it computationally expensive for large
+transaction datasets. Consequently, this feature was evaluated only on a development
+dataset containing approximately 2,000 retail accounts rather than the full customer
+population as it failed to be added to 20000 accounts due to capacity limit.
+
+Second, the study relied primarily on account-level behavioural features. While these
+features capture temporal transaction patterns, they do not explicitly model relationships
+between accounts. Previous research has shown that graph-based features, such as
+shared counterparties, transaction chains, and network centrality measures, can provide
+additional information for detecting organised money mule networks. These features
+were not included because constructing large-scale transaction graphs would require
+substantially greater computational resources and engineering effort.
+
+Another important limitation concerns the availability of labelled data.
+Only a relatively small number of confirmed money mule accounts were
+available, while the remaining accounts were unlabeled rather than
+verified non-mule accounts. Nevertheless, for the supervised learning
+experiments, all unlabeled accounts were treated as negative examples.
+
+This assumption may not hold in practice, since some genuine money mule
+accounts may remain unidentified within the unlabeled population.
+Consequently, the supervised models were trained using noisy labels,
+which may reduce both model performance and the reliability of the
+estimated class probabilities. Positive-unlabeled (PU) learning provides
+a potential solution to this problem by explicitly accounting for the
+presence of hidden positives within the unlabeled data and therefore
+represents an important direction for future work.
+
+In addition, the engineered behavioural features were intentionally designed to remain
+interpretable and computationally feasible. As a result, some potentially informative
+characteristics, including graph-based features like counterparty behaviour, in and out degree, long-range temporal
+dependencies, and static features like customer profile information, were not incorporated. These may provide additional discriminatory power when combined with the existing behavioural
+features.
+\section{Future Work}
+Several directions for future work can be considered. 
+
+First, the proposed behavioural
+features could be computed on the complete transaction database using distributed
+implementations to evaluate scalability in a production environment. In particular, the FIFO-based drain ratio should be redesigned or optimised before being applied to larger samples, since the sequential allocation of outgoing transactions to incoming funds is computationally expensive.
+
+A second direction is to incorporate richer relational information between accounts. The behavioural features developed in this project primarily describe the transaction patterns of individual accounts, while relationships between connected accounts were not explicitly modelled. Counterparty-based features, such as repeated transfers between the same accounts or measures of counterparty diversity, could provide additional discriminatory power with relatively low computational overhead. More sophisticated graph-based approaches, including network centrality measures, community detection and Graph Neural Networks, could further capture the structure of money mule networks and improve detection performance.
+
+Third, more advanced semi-supervised approaches, such as positive-unlabeled (PU) learning
+or weakly-supervised representation learning, may better exploit the large amount of
+unlabeled transaction data available in banking applications. 
+
+Another promising direction is to incorporate temporal modelling of transaction behaviour. The behavioural features developed in this study are aggregated over a predefined observation period and therefore do not explicitly capture how account behaviour evolves over time. Sequential models, such as recurrent neural networks or Transformer-based architectures, could model the temporal ordering of transactions and detect behavioural changes as they occur. Such approaches may improve the detection of money mules whose transaction patterns develop progressively rather than appearing anomalous only after aggregation.
+
+Finally, combining
+behavioural anomaly detection with supervised classification in a hybrid detection
+framework may further improve both detection performance and model interpretability.

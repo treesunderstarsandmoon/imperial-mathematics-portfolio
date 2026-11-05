@@ -1,0 +1,32 @@
+\chapter{Background}
+Money mule accounts play a critical role in modern financial crime schemes, including fraud, money laundering, and the movement of illicit funds. A money mule is an individual or entity that transfers or receives money on behalf of criminals, often allowing illegal funds to pass through seemingly legitimate bank accounts before being withdrawn, transferred, or dispersed to other destinations (\cite{homeoffice2024moneymule}). The increasing use of digital banking channels, instant payments, and cross-border transactions has made the identification of money mule activity an important challenge for financial institutions and regulatory authorities.The scale of fraud-related losses illustrates the importance of this challenge. According to Annual Fraud Report 2025 \cite{ukfinance2025annualfraud}, in the UK,
+reported fraud losses across authorised and unauthorised channels reached approximately
+\pounds1.17 billion in 2024, with 3.31 million confirmed cases. Authorised push payment
+(APP) fraud alone accounted for around \pounds450.7 million of losses, and Faster Payments
+were used in 96\% of fraudulent APP scam payments. Since mule accounts are commonly used
+to receive and move the proceeds of such fraud, these figures highlight the importance of
+detecting suspicious receiving and onward-transfer behaviour in modern payment systems.
+
+The presence of money mule accounts poses significant risks to the financial system. These accounts facilitate the laundering of proceeds from fraud, cybercrime, and other criminal activities, making it more difficult for authorities to trace the origin and destination of illicit funds. Beyond direct financial losses, money mule networks contribute to reputational damage, regulatory penalties, increased compliance costs, and reduced trust in financial institutions. Consequently, the early detection of money mule behaviour has become a key objective within anti-money laundering (AML) and fraud prevention frameworks.The operational scale of mule networks is reflected in recent law-enforcement activity. Europol's
+European Money Mule Action 2023 \cite{europol2023papertrail} identified 10,759 money mules and 474 recruiters or herders,
+leading to 1,013 arrests and 4,659 investigations, with approximately \euro32 million in
+prevented losses. Similarly, the US Department of Justice reported enforcement actions against
+more than 3,000 money mules in its 2024 Money Mule Initiative \cite{doj2024moneymules}. These figures suggest that
+money mule activity is not limited to isolated suspicious accounts, but often forms part of
+larger organised networks.
+
+Detecting money mule accounts is challenging for several reasons. First, genuine mule accounts often resemble legitimate customers in terms of account ownership, customer demographics, and transaction volumes. Second, mule behaviour is highly heterogeneous and may manifest through multiple transaction patterns. For example, some mule accounts exhibit rapid cash-out behaviour, where incoming funds are quickly withdrawn or transferred shortly after receipt. Others act as pass-through accounts, receiving funds from multiple sources before redistributing them to multiple destinations. Furthermore, new laundering strategies continuously emerge, making it difficult to rely solely on predefined rules or known typologies.
+
+Empirical evidence from known mule accounts supports the importance of these behavioural
+signals. A RUSI study \cite{westmore2025followingfraud} using data provided by Lloyds Bank analysed \pounds7.2 million of
+outbound transactions from known money mule accounts between June and August 2024. The
+study found that nearly 28\% of incoming value left mule accounts within 15 minutes, a further
+25\% left within one hour, and less than 15\% remained after 24 hours. It also found that 57\%
+of outbound value left via Faster Payments, while debit card spending, inter-account transfers
+and cash withdrawals accounted for 18\%, 11\% and 10\%, respectively. These findings motivate
+the construction of features capturing pass-through behaviour, short-window outflows,
+transaction velocity, and fan-out patterns.
+
+Traditional rule-based monitoring systems remain widely used in financial institutions. While such systems can effectively identify known suspicious patterns, they often generate large numbers of false positives and may struggle to detect previously unseen behaviours. Machine learning approaches provide an alternative by analysing large volumes of transaction data and identifying unusual behavioural patterns automatically. In particular, unsupervised anomaly detection techniques are attractive because labelled examples of confirmed money mule accounts are often scarce, incomplete, or unavailable.
+
+This thesis investigates the detection of potential money mule accounts using large-scale banking transaction data. The study focuses on modelling account-level transactional behaviour through the construction of behavioural features derived from account activity, transaction flows, and payment characteristics. By analysing patterns of fund movement and identifying accounts whose behaviour deviates from typical customer activity, the objective is to develop a framework capable of prioritising potentially suspicious accounts for further investigation.
